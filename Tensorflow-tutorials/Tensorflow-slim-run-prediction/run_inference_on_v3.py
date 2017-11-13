@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import tensorflow as tf
-import urllib2
+import urllib3
 ##Matplotlib chooses Xwindows backend by default. You need to set matplotlib do not use Xwindows backend. Uncomment next 2 lines if you are running this on a server which doesn't have a display
 #import matplotlib
 #matplotlib.use('Agg')
@@ -19,7 +19,10 @@ image_size = inception.inception_v3.default_image_size
 
 with tf.Graph().as_default():
     url = sys.argv[1]
-    image_string = urllib2.urlopen(url).read()
+    http = urllib3.PoolManager()
+    response = http.request('GET', url)
+    image_string = response.data
+    #image_string = urllib2.urlopen(url).read()
     image = tf.image.decode_jpeg(image_string, channels=3)
     processed_image = inception_preprocessing.preprocess_image(image, image_size, image_size, is_training=False)
     processed_images  = tf.expand_dims(processed_image, 0)
